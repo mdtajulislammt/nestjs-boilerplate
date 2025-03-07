@@ -65,6 +65,10 @@ model User {
   two_factor_secret     String? // secret key for two factor authentication
 
   accounts                  Account[]
+  creator_conversations     Conversation[] @relation("creator")
+  participant_conversations Conversation[] @relation("participant")
+  receiver_messages         Message[]      @relation("receiver")
+  sender_messages           Message[]      @relation("sender")
   receiver_notifications    Notification[] @relation("receiver")
   sender_notifications      Notification[] @relation("sender")
 
@@ -74,6 +78,7 @@ model User {
   roles                Role[]
   role_users           RoleUser[]
   payment_transactions PaymentTransaction[]
+  posts                Post[]
 
   @@map("users")
 }
@@ -224,6 +229,53 @@ model PaymentTransaction {
   @@map("payment_transactions")
 }
 
+model Message {
+  id              String         @id @default(cuid())
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @default(now())
+  deleted_at      DateTime?
+  status          MessageStatus? @default(PENDING)
+  sender_id       String?
+  receiver_id     String?
+  conversation_id String?
+  attachment_id   String?
+  message         String?
+  attachment      Attachment?    @relation(fields: [attachment_id], references: [id])
+  conversation    Conversation?  @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  receiver        User?          @relation("receiver", fields: [receiver_id], references: [id])
+  sender          User?          @relation("sender", fields: [sender_id], references: [id])
+
+  @@map("messages")
+}
+
+model Attachment {
+  id         String    @id @default(cuid())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  name       String?
+  type       String?
+  size       Int?
+  file       String?
+  file_alt   String?
+  messages   Message[]
+
+  @@map("attachments")
+}
+
+model Conversation {
+  id             String    @id @default(cuid())
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @default(now())
+  deleted_at     DateTime?
+  creator_id     String?
+  participant_id String?
+  creator        User?     @relation("creator", fields: [creator_id], references: [id])
+  participant    User?     @relation("participant", fields: [participant_id], references: [id])
+  messages       Message[]
+
+  @@map("conversations")
+}
 
 model Faq {
   id         String    @id @default(cuid())
@@ -318,6 +370,28 @@ model UserSetting {
   @@map("user_settings")
 }
 
+// this table stores web messaging
+model Post {
+  id         String    @id @default(cuid())
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+  deleted_at DateTime?
+  status     Int?      @default(1) @db.SmallInt
+
+  // post number
+  post_number Int? @default(0)
+
+  user_id String?
+  user    User?   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  user_display_name String?
+
+  body String? @db.Text
+
+  views Int? @default(0)
+
+  @@map("posts")
+}
 
 // this table stores example
 // model Note {
@@ -334,3 +408,10 @@ model UserSetting {
 //   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 //   @@map("posts")
 // }
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+}
