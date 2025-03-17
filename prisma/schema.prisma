@@ -78,7 +78,6 @@ model User {
   roles                Role[]
   role_users           RoleUser[]
   payment_transactions PaymentTransaction[]
-  posts                Post[]
 
   @@map("users")
 }
@@ -229,6 +228,13 @@ model PaymentTransaction {
   @@map("payment_transactions")
 }
 
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+}
+
 model Message {
   id              String         @id @default(cuid())
   created_at      DateTime       @default(now())
@@ -370,29 +376,6 @@ model UserSetting {
   @@map("user_settings")
 }
 
-// this table stores web messaging
-model Post {
-  id         String    @id @default(cuid())
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now())
-  deleted_at DateTime?
-  status     Int?      @default(1) @db.SmallInt
-
-  // post number
-  post_number Int? @default(0)
-
-  user_id String?
-  user    User?   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  user_display_name String?
-
-  body String? @db.Text
-
-  views Int? @default(0)
-
-  @@map("posts")
-}
-
 // this table stores example
 // model Note {
 //   id                String  @id @default(cuid())
@@ -408,10 +391,3 @@ model Post {
 //   tenant    Organization? @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
 //   @@map("posts")
 // }
-
-enum MessageStatus {
-  PENDING
-  SENT
-  DELIVERED
-  READ
-}

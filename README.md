@@ -1,6 +1,6 @@
 # Description
 
-backend system created using nestjs
+backend created using nestjs
 
 ## Config
 
