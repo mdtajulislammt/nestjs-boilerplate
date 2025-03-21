@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ecommerce-backend
-    container_name: ecommerce-backend
+    image: backend
+    container_name: backend
     ports:
       - "4000:4000"
     environment:
@@ -15,12 +15,13 @@ services:
 
       - NODE_ENV=development
       # host.docker.internal is the host machine's IP address
-      # - DATABASE_URL=postgresql://postgres:root@host.docker.internal/ecommerce 
+      # - DATABASE_URL=postgresql://postgres:root@host.docker.internal/backend 
       # for use the "postgres" "service" name
-      - DATABASE_URL=postgresql://postgres:root@postgres/ecommerce
+      - DATABASE_URL=postgresql://postgres:root@postgres/backend
 
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+
       - TURN_SERVER=turn:turnserver:3478
       - TURN_USERNAME=webrtc
       - TURN_PASSWORD=strongpassword
@@ -40,7 +41,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: ecommerce
+      POSTGRES_DB: backend
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
