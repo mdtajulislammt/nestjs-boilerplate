@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { CreateWebsiteInfoDto } from './dto/create-website-info.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
 import appConfig from '../../../config/app.config';
 
 @Injectable()
-export class WebsiteInfoService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class WebsiteInfoService {
+  constructor(private prisma: PrismaService) {}
 
   async create(
     createWebsiteInfoDto: CreateWebsiteInfoDto,

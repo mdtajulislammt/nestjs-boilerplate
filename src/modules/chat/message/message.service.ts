@@ -11,13 +11,11 @@ import { UserRepository } from '../../../common/repository/user/user.repository'
 import { Role } from 'src/common/guard/role/role.enum';
 
 @Injectable()
-export class MessageService extends PrismaClient {
+export class MessageService {
   constructor(
     private prisma: PrismaService,
     private readonly messageGateway: MessageGateway,
-  ) {
-    super();
-  }
+  ) {}
 
   async create(user_id: string, createMessageDto: CreateMessageDto) {
     try {

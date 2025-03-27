@@ -4,10 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
-export class ContactService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class ContactService {
+  constructor(private prisma: PrismaService) {}
 
   async create(createContactDto: CreateContactDto) {
     try {

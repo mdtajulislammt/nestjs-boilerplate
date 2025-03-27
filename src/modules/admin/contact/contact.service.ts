@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { DateHelper } from '../../../common/helper/date.helper';
 
 @Injectable()
-export class ContactService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class ContactService {
+  constructor(private prisma: PrismaService) {}
 
   async create(createContactDto: CreateContactDto) {
     try {

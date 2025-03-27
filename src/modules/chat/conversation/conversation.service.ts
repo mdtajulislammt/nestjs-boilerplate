@@ -9,13 +9,11 @@ import { DateHelper } from '../../../common/helper/date.helper';
 import { MessageGateway } from '../message/message.gateway';
 
 @Injectable()
-export class ConversationService extends PrismaClient {
+export class ConversationService {
   constructor(
     private prisma: PrismaService,
     private readonly messageGateway: MessageGateway,
-  ) {
-    super();
-  }
+  ) {}
 
   async create(createConversationDto: CreateConversationDto) {
     try {

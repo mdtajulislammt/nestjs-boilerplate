@@ -3,10 +3,8 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 @Injectable()
-export class UserService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class UserService {
+  constructor(private prisma: PrismaService) {}
 
   async findAll() {
     try {

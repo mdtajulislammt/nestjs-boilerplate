@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { BatchCreateFaqDto, CreateFaqDto } from './dto/create-faq.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { DateHelper } from '../../../common/helper/date.helper';
 
 @Injectable()
-export class FaqService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class FaqService {
+  constructor(private prisma: PrismaService) {}
 
   async create(createFaqDto: CreateFaqDto) {
     try {

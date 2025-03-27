@@ -23,14 +23,12 @@ import { LoginDto } from './dto/login.dto';
 import { LogisticsType } from './dto/logistics-register.dto';
 
 @Injectable()
-export class AuthService extends PrismaClient {
+export class AuthService {
   constructor(
     private jwtService: JwtService,
     private prisma: PrismaService,
     private mailService: MailService,
-  ) {
-    super();
-  }
+  ) {}
 
   async me(userId: string) {
     try {

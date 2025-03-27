@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 
 @Injectable()
-export class PaymentTransactionService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class PaymentTransactionService {
+  constructor(private prisma: PrismaService) {}
 
   async findAll(user_id?: string) {
     try {

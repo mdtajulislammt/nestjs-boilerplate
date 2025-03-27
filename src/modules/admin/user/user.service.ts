@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { UserRepository } from '../../../common/repository/user/user.repository';
 import appConfig from '../../../config/app.config';
@@ -9,10 +8,8 @@ import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
 import { DateHelper } from '../../../common/helper/date.helper';
 
 @Injectable()
-export class UserService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class UserService {
+  constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
     try {

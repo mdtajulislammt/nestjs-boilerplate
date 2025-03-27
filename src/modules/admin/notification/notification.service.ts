@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { SojebStorage } from 'src/common/lib/Disk/SojebStorage';
 import appConfig from 'src/config/app.config';
@@ -7,10 +6,8 @@ import { UserRepository } from 'src/common/repository/user/user.repository';
 import { Role } from 'src/common/guard/role/role.enum';
 
 @Injectable()
-export class NotificationService extends PrismaClient {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
+export class NotificationService {
+  constructor(private prisma: PrismaService) {}
 
   async findAll(user_id: string) {
     try {
