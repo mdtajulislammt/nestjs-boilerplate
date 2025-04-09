@@ -1,7 +1,8 @@
 import { IStorage } from './iStorage';
-import fs from 'fs/promises';
-import fsSync from 'fs';
+import * as fs from 'fs/promises';
+import * as fsSync from 'fs';
 import { DiskOption } from '../Option';
+import path from 'path';
 
 /**
  * LocalAdapter for local file storage
@@ -65,12 +66,14 @@ export class LocalAdapter implements IStorage {
    */
   async put(key: string, value: any) {
     try {
-      await fs.writeFile(`${this._config.connection.rootUrl}/${key}`, value);
+      const filePath = path.join(this._config.connection.rootUrl, key);
+      const dirPath = path.dirname(filePath);
+      await fs.mkdir(dirPath, { recursive: true });
+      await fs.writeFile(filePath, value);
     } catch (err) {
       console.log(err);
     }
   }
-
   /**
    * delete data
    * @param key
