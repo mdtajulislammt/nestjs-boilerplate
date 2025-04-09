@@ -1,13 +1,6 @@
 // external imports
-import {
-  Injectable,
-  UnauthorizedException,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 //internal imports
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserRepository } from '../../common/repository/user/user.repository';
@@ -18,9 +11,6 @@ import appConfig from '../../config/app.config';
 import { SojebStorage } from '../../common/lib/Disk/SojebStorage';
 import { DateHelper } from '../../common/helper/date.helper';
 import { StripePayment } from 'src/common/lib/Payment/stripe/StripePayment';
-import { LogisticsRegisterDto } from './dto/logistics-register.dto';
-import { LoginDto } from './dto/login.dto';
-import { LogisticsType } from './dto/logistics-register.dto';
 
 @Injectable()
 export class AuthService {
@@ -74,19 +64,6 @@ export class AuthService {
           message: 'User not found',
         };
       }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  }
-
-  async convertToVendor(user_id: string) {
-    try {
-      const response = await UserRepository.convertTo(user_id, 'vendor');
-
-      return response;
     } catch (error) {
       return {
         success: false,
@@ -660,81 +637,6 @@ export class AuthService {
           message: 'User not found',
         };
       }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  }
-
-  async logisticsRegister(logisticsRegisterDto: LogisticsRegisterDto) {
-    try {
-      const { email, type, phone_number, password } = logisticsRegisterDto;
-
-      // Create user first
-      const user = await UserRepository.createUser({
-        email: email,
-        type: type,
-        phone_number: phone_number,
-        password: password,
-      });
-
-      if (user.success) {
-        // Update phone number
-        await this.prisma.user.update({
-          where: { email },
-          data: { phone_number },
-        });
-
-        // Generate verification token
-        const token = await UcodeRepository.createVerificationToken({
-          userId: user.data.id,
-          email: email,
-        });
-
-        // Send verification email with token
-        await this.mailService.sendVerificationLink({
-          email,
-          name: email,
-          token: token.token,
-          type: 'logistics',
-        });
-
-        return {
-          success: true,
-          message: 'We have sent a verification link to your email',
-        };
-      }
-
-      return user;
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-  }
-
-  async logisticsLogin(loginDto: LoginDto) {
-    try {
-      const { email, password } = loginDto;
-      // Use existing validateUser method
-      const user = await this.validateUser(email, password);
-
-      // Check if user is either a manager or agent
-      if (
-        user &&
-        (user.type === LogisticsType.MANAGER ||
-          user.type === LogisticsType.AGENT)
-      ) {
-        return this.login({
-          userId: user.id,
-          email: user.email,
-        });
-      }
-
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     } catch (error) {
       return {
         success: false,

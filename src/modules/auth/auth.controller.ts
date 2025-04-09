@@ -22,8 +22,7 @@ import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import appConfig from '../../config/app.config';
-import { LogisticsRegisterDto } from './dto/logistics-register.dto';
-import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -45,23 +44,6 @@ export class AuthController {
       return {
         success: false,
         message: 'Failed to fetch user details',
-      };
-    }
-  }
-
-  @ApiOperation({ summary: 'Convert to vendor' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Post('convert-to-vendor')
-  async convertToVendor(@Req() req: Request) {
-    try {
-      const user_id = req.user.userId;
-      const response = await this.authService.convertToVendor(user_id);
-      return response;
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
       };
     }
   }
@@ -142,6 +124,21 @@ export class AuthController {
         message: error.message,
       };
     }
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin(): Promise<any> {
+    return HttpStatus.OK;
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleLoginRedirect(@Req() req: Request): Promise<any> {
+    return {
+      statusCode: HttpStatus.OK,
+      data: req.user,
+    };
   }
 
   // update user
@@ -380,27 +377,6 @@ export class AuthController {
     }
   }
   // -------end change email address------
-
-  @Post('logistics-register')
-  @ApiOperation({ summary: 'Register logistics user' })
-  async logisticsRegister(@Body() logisticsRegisterDto: LogisticsRegisterDto) {
-    // console.log('Route Hit');
-    try {
-      return await this.authService.logisticsRegister(logisticsRegisterDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @Post('logistics-login')
-  @ApiOperation({ summary: 'Login logistics user' })
-  async logisticsLogin(@Body() loginDto: LoginDto) {
-    try {
-      return await this.authService.logisticsLogin(loginDto);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
-    }
-  }
 
   // --------- 2FA ---------
   @ApiOperation({ summary: 'Generate 2FA secret' })
