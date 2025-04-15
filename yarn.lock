@@ -1547,7 +1547,7 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.2.tgz#821f8442f4175d8f0467b9daf26e3a18e2d02af2"
   integrity sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==
 
-"@swc/cli@0.7.2":
+"@swc/cli@^0.7.2":
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/@swc/cli/-/cli-0.7.2.tgz#dc64d70dc61b0c1a55ba6804ae9d42e049b95fdf"
   integrity sha512-B73b2Orrd0tauaX3Jct9MxkAI79U3OMHzRB++x2wfyq+JPjgC6foJK6zyY2JI0vsTlaTbGpx9+hsowTQ8RtQFA==
@@ -1612,7 +1612,7 @@
   resolved "https://registry.yarnpkg.com/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.11.21.tgz#7ff6dd290b36c013a98aea877cda288251e48119"
   integrity sha512-BT9BNNbMxdpUM1PPAkYtviaV0A8QcXttjs2MDtOeSqqvSJaPtyM+Fof2/+xSwQDmDEFzbGCcn75M5+xy3lGqpA==
 
-"@swc/core@1.11.21":
+"@swc/core@^1.11.21":
   version "1.11.21"
   resolved "https://registry.yarnpkg.com/@swc/core/-/core-1.11.21.tgz#012dc73111e6ecea96cc30b522a50355eca4b35c"
   integrity sha512-/Y3BJLcwd40pExmdar8MH2UGGvCBrqNN7hauOMckrEX2Ivcbv3IMhrbGX4od1dnF880Ed8y/E9aStZCIQi0EGw==
