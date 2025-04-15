@@ -24,6 +24,7 @@ model Account {
   user                User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([provider, provider_account_id])
+  @@map("accounts")
 }
 
 model User {
@@ -45,15 +46,14 @@ model User {
   domain     String? @unique
   avatar     String?
 
-  phone_number     String?
-  country          String?
-  state            String?
-  local_government String?
-  city             String?
-  address          String?
-  zip_code         String?
-  gender           String?
-  date_of_birth    DateTime? @db.Date
+  phone_number  String?
+  country       String?
+  state         String?
+  city          String?
+  address       String?
+  zip_code      String?
+  gender        String?
+  date_of_birth DateTime? @db.Date
 
   // billing id. e.g. stripe customer id
   billing_id String?
