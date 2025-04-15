@@ -1,12 +1,12 @@
 import stripe from 'stripe';
 import appConfig from '../../../../config/app.config';
 import { Fetch } from '../../Fetch';
-import fs from 'fs';
+import * as fs from 'fs';
 
 const STRIPE_SECRET_KEY = appConfig().payment.stripe.secret_key;
 
 const Stripe = new stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2025-01-27.acacia',
+  apiVersion: '2025-03-31.basil',
 });
 
 const STRIPE_WEBHOOK_SECRET = appConfig().payment.stripe.webhook_secret;

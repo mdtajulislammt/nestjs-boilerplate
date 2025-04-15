@@ -2,7 +2,7 @@
 CREATE TYPE "MessageStatus" AS ENUM ('PENDING', 'SENT', 'DELIVERED', 'READ');
 
 -- CreateTable
-CREATE TABLE "Account" (
+CREATE TABLE "accounts" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "type" TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE "Account" (
     "id_token" TEXT,
     "session_state" TEXT,
 
-    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -39,7 +39,6 @@ CREATE TABLE "users" (
     "phone_number" TEXT,
     "country" TEXT,
     "state" TEXT,
-    "local_government" TEXT,
     "city" TEXT,
     "address" TEXT,
     "zip_code" TEXT,
@@ -325,7 +324,7 @@ CREATE TABLE "_PermissionToRole" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Account_provider_provider_account_id_key" ON "Account"("provider", "provider_account_id");
+CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
@@ -343,7 +342,7 @@ CREATE UNIQUE INDEX "settings_key_key" ON "settings"("key");
 CREATE INDEX "_PermissionToRole_B_index" ON "_PermissionToRole"("B");
 
 -- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ucodes" ADD CONSTRAINT "ucodes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
