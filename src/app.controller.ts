@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -8,13 +9,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
-import puppeteer from 'puppeteer';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Response } from 'express';
+import { Readable } from 'stream';
 
 @Controller()
 export class AppController {
@@ -23,6 +23,33 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get('test-chunk-stream')
+  async chunkStream(@Res() res: Response) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.flushHeaders(); // make sure headers are sent immediately
+
+    const stream = new Readable({
+      read() {},
+    });
+
+    // Pipe the stream to the response
+    stream.pipe(res);
+
+    let counter = 0;
+    const interval = setInterval(() => {
+      if (counter >= 10) {
+        stream.push('Stream complete.\n');
+        stream.push(null); // ends the stream
+        clearInterval(interval);
+      } else {
+        stream.push(`Chunk ${counter + 1} at ${new Date().toISOString()}\n`);
+        counter++;
+      }
+    }, 500);
   }
 
   @Get('test-file-stream')
