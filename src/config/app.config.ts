@@ -41,6 +41,7 @@ export default () => ({
 
   mail: {
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
+    port: process.env.MAIL_PORT || 587,
     user: process.env.MAIL_USERNAME,
     password: process.env.MAIL_PASSWORD,
     from: process.env.MAIL_FROM_NAME,
