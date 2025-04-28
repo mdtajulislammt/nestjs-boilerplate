@@ -13,9 +13,15 @@ import { GoogleStrategy } from './strategies/google.strategy';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: appConfig().jwt.secret,
-      signOptions: { expiresIn: appConfig().jwt.expiry },
+    // JwtModule.register({
+    //   secret: appConfig().jwt.secret,
+    //   signOptions: { expiresIn: appConfig().jwt.expiry },
+    // }),
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secret: appConfig().jwt.secret,
+        signOptions: { expiresIn: appConfig().jwt.expiry },
+      }),
     }),
     PrismaModule,
     MailModule,
