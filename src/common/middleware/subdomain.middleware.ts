@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, NestMiddleware } from '@nestjs/common';
 
 @Injectable()
@@ -7,7 +6,6 @@ export class SubdomainMiddleware implements NestMiddleware {
     const domain = req.get('host').match(/\w+/); // e.g., host: "subdomain.website.com"
     if (domain) {
       const subdomain = domain[0]; // Use "subdomain"
-      console.log(subdomain);
     }
 
     next();

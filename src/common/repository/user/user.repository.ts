@@ -249,9 +249,9 @@ export class UserRepository {
       if (type && ArrayHelper.inArray(type, Object.values(Role))) {
         data['type'] = type;
 
-        if (type == Role.VENDOR) {
-          data['approved_at'] = DateHelper.now();
-        }
+        // if (type == Role.VENDOR) {
+        //   data['approved_at'] = DateHelper.now();
+        // }
       }
 
       const user = await prisma.user.create({

@@ -9,7 +9,7 @@ export class StringHelper {
    * @param string
    * @returns
    */
-  public static cfirst(string) {
+  public static cfirst(string: string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
@@ -18,7 +18,7 @@ export class StringHelper {
    * @param string
    * @returns
    */
-  public static ucfirst(string) {
+  public static ucfirst(string: string) {
     return string.charAt(0).toLowerCase() + string.slice(1);
   }
 
