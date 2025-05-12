@@ -150,7 +150,45 @@ export class StripePayment {
    * @param price
    * @returns
    */
-  static async createCheckoutSession(customer: string, price: string) {
+  static async createCheckoutSession() {
+    const success_url = `${
+      appConfig().app.url
+    }/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancel_url = `${appConfig().app.url}/failed`;
+
+    const session = await Stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Sample Product',
+            },
+            unit_amount: 2000, // $20.00
+          },
+          quantity: 1,
+        },
+      ],
+
+      success_url: success_url,
+      cancel_url: cancel_url,
+      // automatic_tax: { enabled: true },
+    });
+    return session;
+  }
+
+  /**
+   * Create stripe hosted checkout session
+   * @param customer
+   * @param price
+   * @returns
+   */
+  static async createCheckoutSessionSubscription(
+    customer: string,
+    price: string,
+  ) {
     const success_url = `${
       appConfig().app.url
     }/success?session_id={CHECKOUT_SESSION_ID}`;
@@ -316,6 +354,77 @@ export class StripePayment {
   //   return payout;
   // }
   // -----------------------payout system end--------------------------------
+
+  // ACH payment
+  static async createToken() {
+    const token = await Stripe.tokens.create({
+      bank_account: {
+        country: 'US',
+        currency: 'usd',
+        routing_number: '110000000',
+        account_number: '000123456789',
+        account_holder_name: 'Jane Doe',
+        account_holder_type: 'individual',
+      },
+    });
+    return token;
+  }
+
+  static async createBankAccount(customerId: string, bankAccountToken: string) {
+    const bankAccount = await Stripe.customers.createSource(customerId, {
+      source: bankAccountToken,
+    });
+    return bankAccount;
+  }
+
+  static async verifyBankAccount(
+    customerId: string,
+    bankAccountId: string,
+    amounts: [number, number],
+  ) {
+    return Stripe.customers.verifySource(customerId, bankAccountId, {
+      amounts,
+    });
+  }
+
+  static async createACHPaymentIntent(customerId: string, amount: number) {
+    return await Stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: 'usd',
+      customer: customerId,
+      payment_method_types: ['us_bank_account'],
+      payment_method_options: {
+        us_bank_account: {
+          verification_method: 'automatic',
+        },
+      },
+    });
+    // return await Stripe.checkout.sessions.create({
+    //   mode: 'payment',
+    //   customer: customerId,
+    //   payment_method_types: ['card', 'us_bank_account'],
+    //   payment_method_options: {
+    //     us_bank_account: {
+    //       verification_method: 'automatic',
+    //     },
+    //   },
+    //   line_items: [
+    //     {
+    //       price_data: {
+    //         currency: 'usd',
+    //         unit_amount: amount * 100,
+    //         product_data: {
+    //           name: 'T-shirt',
+    //         },
+    //       },
+    //       quantity: 1,
+    //     },
+    //   ],
+    //   success_url: 'https://example.com/success',
+    //   cancel_url: 'https://example.com/cancel',
+    // });
+  }
+  // end ACH
 
   static handleWebhook(rawBody: string, sig: string | string[]): stripe.Event {
     const event = Stripe.webhooks.constructEvent(

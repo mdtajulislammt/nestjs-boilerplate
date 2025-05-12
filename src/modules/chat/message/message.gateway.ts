@@ -13,11 +13,14 @@ import { MessageStatus } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 import appConfig from '../../../config/app.config';
 import { ChatRepository } from 'src/common/repository/chat/chat.repository';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
+  maxHttpBufferSize: 1e8, // 100MB
 })
 export class MessageGateway
   implements
@@ -29,7 +32,18 @@ export class MessageGateway
   @WebSocketServer()
   server: Server;
 
-  constructor() {}
+  private recordings = new Map<string, fs.WriteStream>();
+  private chunks = new Map<string, Buffer>();
+  private uploadsDir = path.join(
+    __dirname,
+    '../../../../public/storage/recordings',
+  );
+
+  constructor() {
+    if (!fs.existsSync(this.uploadsDir)) {
+      fs.mkdirSync(this.uploadsDir, { recursive: true });
+    }
+  }
 
   // Map to store connected clients
   public clients = new Map<string, string>(); // userId -> socketId
@@ -84,6 +98,14 @@ export class MessageGateway
     )?.[0];
     if (userId) {
       this.clients.delete(userId);
+
+      const username = [...this.activeUsers.entries()].find(
+        ([, id]) => id === client.id,
+      )?.[0];
+      if (username) {
+        this.activeUsers.delete(username);
+      }
+
       await ChatRepository.updateUserStatus(userId, 'offline');
       // notify the user that the user is offline
       this.server.emit('userStatusChange', {
@@ -208,6 +230,50 @@ export class MessageGateway
     const receiverSocketId = this.activeUsers.get(receiver);
     if (receiverSocketId) {
       this.server.to(receiverSocketId).emit('callEnded');
+    }
+  }
+
+  // recording
+  @SubscribeMessage('recordingChunk')
+  handleRecordingChunk(
+    client: Socket,
+    @MessageBody()
+    payload: {
+      recordingId: string;
+      sequence: number;
+      chunk: Buffer | any;
+    },
+  ) {
+    console.log('Received chunk', payload.sequence, payload.chunk.length);
+    const { recordingId, chunk } = payload;
+    const filePath = path.join(this.uploadsDir, `${recordingId}.webm`);
+
+    if (!this.chunks.has(recordingId)) {
+      this.chunks.set(recordingId, Buffer.alloc(0));
+    }
+
+    this.chunks.set(
+      recordingId,
+      Buffer.concat([
+        this.chunks.get(recordingId),
+        Buffer.from(new Uint8Array(chunk)),
+      ]),
+    );
+  }
+
+  @SubscribeMessage('recordingEnded')
+  handleRecordingEnd(
+    client: Socket,
+    @MessageBody() payload: { recordingId: string },
+  ) {
+    const filePath = path.join(this.uploadsDir, `${payload.recordingId}.webm`);
+    const stream = fs.createWriteStream(filePath, { flags: 'a' });
+
+    console.log(`Started writing to file ${filePath}`);
+    const buffer = this.chunks.get(payload.recordingId);
+    if (buffer) {
+      stream.write(buffer);
+      this.chunks.delete(payload.recordingId);
     }
   }
 }
