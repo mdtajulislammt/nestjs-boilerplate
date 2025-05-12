@@ -61,16 +61,21 @@ export class MailService {
     token: string;
     type: string;
   }) {
-    const verificationLink = `${appConfig().app.client_app_url}/verify-email?token=${params.token}&email=${params.email}&type=${params.type}`;
+    try {
+      const verificationLink = `${appConfig().app.client_app_url}/verify-email?token=${params.token}&email=${params.email}&type=${params.type}`;
 
-    await this.mailerService.sendMail({
-      to: params.email,
-      subject: 'Verify Your Email',
-      template: './verification-link',
-      context: {
-        name: params.name,
-        verificationLink,
-      },
-    });
+      // add to queue
+      await this.queue.add('sendVerificationLink', {
+        to: params.email,
+        subject: 'Verify Your Email',
+        template: './verification-link',
+        context: {
+          name: params.name,
+          verificationLink,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
