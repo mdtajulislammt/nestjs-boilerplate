@@ -2,15 +2,16 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 //internal imports
+import appConfig from '../../config/app.config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserRepository } from '../../common/repository/user/user.repository';
 import { MailService } from '../../mail/mail.service';
 import { UcodeRepository } from '../../common/repository/ucode/ucode.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
-import appConfig from '../../config/app.config';
 import { SojebStorage } from '../../common/lib/Disk/SojebStorage';
 import { DateHelper } from '../../common/helper/date.helper';
-import { StripePayment } from 'src/common/lib/Payment/stripe/StripePayment';
+import { StripePayment } from '../../common/lib/Payment/stripe/StripePayment';
+import { StringHelper } from '../../common/helper/string.helper';
 
 @Injectable()
 export class AuthService {
@@ -126,7 +127,15 @@ export class AuthService {
             appConfig().storageUrl.avatar + oldImage.avatar,
           );
         }
-        data.avatar = image.filename;
+
+        // upload file
+        const fileName = `${StringHelper.randomString()}${image.originalname}`;
+        await SojebStorage.put(
+          appConfig().storageUrl.avatar + fileName,
+          image.buffer,
+        );
+
+        data.avatar = fileName;
       }
       const user = await UserRepository.getUserDetails(userId);
       if (user) {

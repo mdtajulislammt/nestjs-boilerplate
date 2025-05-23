@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -148,17 +148,18 @@ export class AuthController {
   @Patch('update')
   @UseInterceptors(
     FileInterceptor('image', {
-      storage: diskStorage({
-        destination:
-          appConfig().storageUrl.rootUrl + appConfig().storageUrl.avatar,
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${file.originalname}`);
-        },
-      }),
+      // storage: diskStorage({
+      //   destination:
+      //     appConfig().storageUrl.rootUrl + appConfig().storageUrl.avatar,
+      //   filename: (req, file, cb) => {
+      //     const randomName = Array(32)
+      //       .fill(null)
+      //       .map(() => Math.round(Math.random() * 16).toString(16))
+      //       .join('');
+      //     return cb(null, `${randomName}${file.originalname}`);
+      //   },
+      // }),
+      storage: memoryStorage(),
     }),
   )
   async updateUser(

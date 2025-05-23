@@ -4,6 +4,14 @@
  * @author Sojeb Sikder <sojebsikder@gmail.com>
  */
 export class StringHelper {
+  public static randomString(length: number = 32): string {
+    const randomName = Array(length)
+      .fill(null)
+      .map(() => Math.round(Math.random() * 16).toString(16))
+      .join('');
+    return randomName;
+  }
+
   /**
    * Capitalize the first letter of a string.
    * @param string

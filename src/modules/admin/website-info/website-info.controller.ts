@@ -9,18 +9,17 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { WebsiteInfoService } from './website-info.service';
 import { CreateWebsiteInfoDto } from './dto/create-website-info.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import appConfig from 'src/config/app.config';
 import { Roles } from 'src/common/guard/role/roles.decorator';
 import { RolesGuard } from 'src/common/guard/role/roles.guard';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { Role } from 'src/common/guard/role/role.enum';
 import { ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 
 @ApiBearerAuth()
 @ApiTags('Website Info')
@@ -39,17 +38,7 @@ export class WebsiteInfoController {
         { name: 'favicon', maxCount: 1 },
       ],
       {
-        storage: diskStorage({
-          destination:
-            appConfig().storageUrl.rootUrl + appConfig().storageUrl.websiteInfo,
-          filename: (req, file, cb) => {
-            const randomName = Array(32)
-              .fill(null)
-              .map(() => Math.round(Math.random() * 16).toString(16))
-              .join('');
-            return cb(null, `${randomName}${file.originalname}`);
-          },
-        }),
+        storage: memoryStorage(),
       },
     ),
   )
