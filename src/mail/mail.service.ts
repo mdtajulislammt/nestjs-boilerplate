@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import appConfig from '../config/app.config';
-import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
 import { MailerService } from '@nestjs-modules/mailer';
+import appConfig from '../config/app.config';
 
 @Injectable()
 export class MailService {

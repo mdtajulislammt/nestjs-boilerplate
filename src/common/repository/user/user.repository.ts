@@ -5,7 +5,6 @@ import { PrismaClient } from '@prisma/client';
 import appConfig from '../../../config/app.config';
 import { ArrayHelper } from '../../helper/array.helper';
 import { Role } from '../../guard/role/role.enum';
-import { DateHelper } from '../../helper/date.helper';
 
 const prisma = new PrismaClient();
 

@@ -14,11 +14,11 @@ export class DateHelper {
   }
 
   // format date
-  static format(date) {
+  static format(date: number | string | Date) {
     const d = new Date(date);
     return d.toISOString();
   }
-  static formatDate(date) {
+  static formatDate(date: number | string | Date) {
     const d = new Date(date);
     return d.toDateString();
   }

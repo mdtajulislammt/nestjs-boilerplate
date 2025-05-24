@@ -8,10 +8,9 @@ import { join } from 'path';
 // import express from 'express';
 // internal imports
 import { AppModule } from './app.module';
-import { CustomExceptionFilter } from './common/exception/custom-exception.filter';
 import appConfig from './config/app.config';
+import { CustomExceptionFilter } from './common/exception/custom-exception.filter';
 import { SojebStorage } from './common/lib/Disk/SojebStorage';
-// import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -50,10 +49,6 @@ async function bootstrap() {
       minio: true,
     },
   });
-  // prisma setup
-  // const prismaService = app.get(PrismaService);
-  // await prismaService.enableShutdownHooks(app);
-  // end prisma
 
   // swagger
   const options = new DocumentBuilder()

@@ -1,6 +1,5 @@
 // external imports
 import {
-  // INestApplication,
   Logger,
   Injectable,
   OnModuleInit,
@@ -11,7 +10,6 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { SoftdeleteMiddleware } from './middleware/softdelete.middleware';
 
 @Injectable()
-// export class PrismaService extends PrismaClient implements OnModuleInit {
 export class PrismaService
   extends PrismaClient<Prisma.PrismaClientOptions, 'query'>
   implements OnModuleInit, OnModuleDestroy
@@ -22,7 +20,6 @@ export class PrismaService
     super({ log: [{ emit: 'event', level: 'query' }] });
 
     // this.logger.log(`Prisma v${Prisma.prismaVersion.client}`);
-    // dfd
     // this.$on('query', (e) => this.logger.debug(`${e.query} ${e.params}`));
 
     // comment out this when seeding data using command line
@@ -41,10 +38,4 @@ export class PrismaService
   async onModuleDestroy() {
     await this.$disconnect();
   }
-
-  // async enableShutdownHooks(app: INestApplication) {
-  //   this.$on('beforeExit', async () => {
-  //     await app.close();
-  //   });
-  // }
 }

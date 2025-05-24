@@ -1,8 +1,8 @@
 // external imports
 import { Command, CommandRunner } from 'nest-commander';
-import { StringHelper } from '../common/helper/string.helper';
 // internal imports
 import appConfig from '../config/app.config';
+import { StringHelper } from '../common/helper/string.helper';
 import { UserRepository } from '../common/repository/user/user.repository';
 import { PrismaService } from '../prisma/prisma.service';
 
