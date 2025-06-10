@@ -79,6 +79,10 @@ export class LocalAdapter implements IStorage {
    * @param key
    */
   async delete(key: string) {
-    await fs.unlink(`${this._config.connection.rootUrl}/${key}`);
+    try {
+      await fs.unlink(`${this._config.connection.rootUrl}/${key}`);
+    } catch (err) {
+      if (err.code !== 'ENOENT') console.error(err);
+    }
   }
 }
