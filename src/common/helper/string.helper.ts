@@ -4,12 +4,25 @@
  * @author Sojeb Sikder <sojebsikder@gmail.com>
  */
 export class StringHelper {
-  public static randomString(length: number = 32): string {
-    const randomName = Array(length)
+  // public static randomString(length: number = 32): string {
+  //   const randomName = Array(length)
+  //     .fill(null)
+  //     .map(() => Math.round(Math.random() * 16).toString(16))
+  //     .join('');
+  //   return randomName;
+  // }
+
+  public static randomString(length: number = 8): string {
+    const now = Date.now().toString(36);
+    const remainingLength = Math.max(length - now.length, 0);
+
+    const randomPart = Array(remainingLength)
       .fill(null)
-      .map(() => Math.round(Math.random() * 16).toString(16))
+      .map(() => Math.floor(Math.random() * 36).toString(36))
       .join('');
-    return randomName;
+
+    const result = (now + randomPart).slice(0, length);
+    return result;
   }
 
   /**

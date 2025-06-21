@@ -1,8 +1,8 @@
-import { IStorage } from './iStorage';
 import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
-import { DiskOption } from '../Option';
 import * as path from 'path';
+import { DiskOption } from '../Option';
+import { IStorage } from './iStorage';
 
 /**
  * LocalAdapter for local file storage
