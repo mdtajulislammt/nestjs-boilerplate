@@ -23,6 +23,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   app.use(helmet());
+  // Enable it, if special charactrers not encoding perfectly
+  // app.use((req, res, next) => {
+  //   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  //   next();
+  // });
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     index: false,
     prefix: '/public',
@@ -31,7 +36,11 @@ async function bootstrap() {
     index: false,
     prefix: '/storage',
   });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   app.useGlobalFilters(new CustomExceptionFilter());
 
   // storage setup
