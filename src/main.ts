@@ -25,7 +25,10 @@ async function bootstrap() {
   app.use(helmet());
   // Enable it, if special charactrers not encoding perfectly
   // app.use((req, res, next) => {
-  //   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  //   // Only force content-type for specific API routes, not Swagger or assets
+  //   if (req.path.startsWith('/api') && !req.path.startsWith('/api/docs')) {
+  //     res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  //   }
   //   next();
   // });
   app.useStaticAssets(join(__dirname, '..', 'public'), {
