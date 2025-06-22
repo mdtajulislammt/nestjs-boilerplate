@@ -331,19 +331,45 @@ export class StripePayment {
     return accountLink;
   }
 
+  // transfer money to account
+  static async createTransfer(
+    account_id: string,
+    amount: number,
+    currency: string,
+  ) {
+    const transfer = await Stripe.transfers.create({
+      amount: amount * 100,
+      currency: currency,
+      destination: account_id,
+    });
+    return transfer;
+  }
+
   // Once the user has an approved Stripe account with a linked bank, you can send them funds.
   static async createPayout(
     account_id: string,
     amount: number,
     currency: string,
   ) {
-    const payout = await Stripe.payouts.create({
-      amount: amount * 100, // amount in cents
-      currency: currency,
-      destination: account_id,
-    });
+    const payout = await Stripe.payouts.create(
+      {
+        amount: amount * 100, // amount in cents
+        currency: currency,
+      },
+      {
+        stripeAccount: account_id, // context of connected account
+      },
+    );
 
     return payout;
+  }
+
+  // check balance of account
+  static async checkBalance(account_id: string) {
+    const balance = await Stripe.balance.retrieve({
+      stripeAccount: account_id,
+    });
+    return balance;
   }
 
   // static async createPayout(amount: number, currency: string) {
