@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import { IStorage } from './iStorage';
 import { DiskOption } from '../Option';
 
@@ -11,7 +11,7 @@ export class S3Adapter implements IStorage {
 
   constructor(config: DiskOption) {
     this._config = config;
-    const awsConfig = {
+    const awsConfig: AWS.S3.ClientConfiguration = {
       endpoint: this._config.connection.awsEndpoint,
       region: this._config.connection.awsDefaultRegion,
       credentials: {
@@ -39,10 +39,13 @@ export class S3Adapter implements IStorage {
    */
 
   url(key: string): string {
+    let _url = '';
     if (this._config.connection.minio) {
-      return `${this._config.connection.awsEndpoint}/${this._config.connection.awsBucket}/${key}`;
+      _url = `${this._config.connection.awsEndpoint}/${this._config.connection.awsBucket}/${key}`;
     }
-    return `${this._config.connection.awsBucket}.s3.${this._config.connection.awsDefaultRegion}.amazonaws.com/${key}`;
+    _url = `${this._config.connection.awsBucket}.s3.${this._config.connection.awsDefaultRegion}.amazonaws.com/${key}`;
+
+    return _url;
   }
 
   /**
