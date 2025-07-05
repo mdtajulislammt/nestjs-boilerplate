@@ -11,10 +11,10 @@ import { Server, Socket } from 'socket.io';
 import { OnModuleInit } from '@nestjs/common';
 import { MessageStatus } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
-import appConfig from '../../../config/app.config';
-import { ChatRepository } from 'src/common/repository/chat/chat.repository';
 import * as path from 'path';
 import * as fs from 'fs';
+import appConfig from '../../../config/app.config';
+import { ChatRepository } from '../../../common/repository/chat/chat.repository';
 
 @WebSocketGateway({
   cors: {
