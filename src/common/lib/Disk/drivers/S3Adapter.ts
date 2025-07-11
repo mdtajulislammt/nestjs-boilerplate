@@ -40,9 +40,9 @@ export class S3Adapter implements IStorage {
 
   url(key: string): string {
     if (this._config.connection.minio) {
-      return `${this._config.connection.awsEndpoint}/${this._config.connection.awsBucket}${key}`;
+      return `${this._config.connection.awsEndpoint}/${this._config.connection.awsBucket}/${key}`;
     }
-    return `https://${this._config.connection.awsBucket}.s3.${this._config.connection.awsDefaultRegion}.amazonaws.com${key}`;
+    return `https://${this._config.connection.awsBucket}.s3.${this._config.connection.awsDefaultRegion}.amazonaws.com/${key}`;
   }
 
   /**

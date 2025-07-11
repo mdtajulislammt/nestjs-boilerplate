@@ -1,6 +1,9 @@
 // external imports
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRedis } from '@nestjs-modules/ioredis';
+import Redis from 'ioredis';
+
 //internal imports
 import appConfig from '../../config/app.config';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -19,6 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private prisma: PrismaService,
     private mailService: MailService,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   async me(userId: string) {
@@ -221,17 +225,97 @@ export class AuthService {
   async login({ email, userId }) {
     try {
       const payload = { email: email, sub: userId };
-      const token = this.jwtService.sign(payload);
+
+      const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+      const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
       const user = await UserRepository.getUserDetails(userId);
+
+      // store refreshToken
+      await this.redis.set(
+        `refresh_token:${user.id}`,
+        refreshToken,
+        'EX',
+        60 * 60 * 24 * 7, // 7 days in seconds
+      );
 
       return {
         success: true,
         message: 'Logged in successfully',
         authorization: {
-          token: token,
           type: 'bearer',
+          access_token: accessToken,
+          refresh_token: refreshToken,
         },
         type: user.type,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
+  async refreshToken(user_id: string, refreshToken: string) {
+    try {
+      const storedToken = await this.redis.get(`refresh_token:${user_id}`);
+
+      if (!storedToken || storedToken != refreshToken) {
+        return {
+          success: false,
+          message: 'Refresh token is required',
+        };
+      }
+
+      if (!user_id) {
+        return {
+          success: false,
+          message: 'User not found',
+        };
+      }
+
+      const userDetails = await UserRepository.getUserDetails(user_id);
+      if (!userDetails) {
+        return {
+          success: false,
+          message: 'User not found',
+        };
+      }
+
+      const payload = { email: userDetails.email, sub: userDetails.id };
+      const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
+
+      return {
+        success: true,
+        authorization: {
+          type: 'bearer',
+          access_token: accessToken,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
+  async revokeRefreshToken(user_id: string) {
+    try {
+      const storedToken = await this.redis.get(`refresh_token:${user_id}`);
+      if (!storedToken) {
+        return {
+          success: false,
+          message: 'Refresh token not found',
+        };
+      }
+
+      await this.redis.del(`refresh_token:${user_id}`);
+
+      return {
+        success: true,
+        message: 'Refresh token revoked successfully',
       };
     } catch (error) {
       return {

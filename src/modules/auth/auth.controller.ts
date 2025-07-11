@@ -7,12 +7,13 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { memoryStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
@@ -106,7 +107,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request) {
+  async login(@Req() req: Request, @Res() res: Response) {
     try {
       const user_id = req.user.id;
 
@@ -117,6 +118,54 @@ export class AuthController {
         email: user_email,
       });
 
+      // store to secure cookies
+      res.cookie('refresh_token', response.authorization.refresh_token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      });
+
+      res.json(response);
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
+  @ApiOperation({ summary: 'Refresh token' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh-token')
+  async refreshToken(
+    @Req() req: Request,
+    @Body() body: { refresh_token: string },
+  ) {
+    try {
+      const user_id = req.user.userId;
+
+      const response = await this.authService.refreshToken(
+        user_id,
+        body.refresh_token,
+      );
+
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  async logout(@Req() req: Request) {
+    try {
+      const userId = req.user.userId;
+      const response = await this.authService.revokeRefreshToken(userId);
       return response;
     } catch (error) {
       return {

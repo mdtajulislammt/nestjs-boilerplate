@@ -18,6 +18,13 @@ export default () => ({
       url: process.env.AWS_URL,
       endpoint: process.env.AWS_ENDPOINT,
     },
+    gcs: {
+      driver: 'gcs',
+      projectId: process.env.GCP_PROJECT_ID,
+      keyFile: process.env.GCP_KEY_FILE,
+      apiEndpoint: process.env.GCP_API_ENDPOINT,
+      bucket: process.env.GCP_BUCKET,
+    },
   },
 
   database: {
@@ -69,13 +76,13 @@ export default () => ({
     rootUrl: './public/storage',
     rootUrlPublic: '/public/storage',
     // storage directory
-    package: '/package/',
-    destination: '/destination/',
-    blog: '/blog/',
-    avatar: '/avatar/',
-    websiteInfo: '/website-info/',
+    package: '/package',
+    destination: '/destination',
+    blog: '/blog',
+    avatar: '/avatar',
+    websiteInfo: '/website-info',
     // chat
-    attachment: '/attachment/',
+    attachment: '/attachment',
   },
 
   defaultUser: {

@@ -1,5 +1,5 @@
 // disk type
-export type DiskType = 'local' | 's3';
+export type DiskType = 'local' | 's3' | 'gcs';
 
 // Disk option
 export type DiskOption = {
@@ -34,5 +34,13 @@ export type DiskOption = {
      * using minio
      */
     minio?: boolean;
+
+    /**
+     * For Google Cloud Storage
+     */
+    gcpProjectId?: string;
+    gcpKeyFile?: string;
+    gcpApiEndpoint?: string;
+    gcpBucket?: string;
   };
 };

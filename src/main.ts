@@ -52,13 +52,18 @@ async function bootstrap() {
     connection: {
       rootUrl: appConfig().storageUrl.rootUrl,
       publicUrl: appConfig().storageUrl.rootUrlPublic,
-      // aws
+      // aws s3
       awsBucket: appConfig().fileSystems.s3.bucket,
       awsAccessKeyId: appConfig().fileSystems.s3.key,
       awsSecretAccessKey: appConfig().fileSystems.s3.secret,
       awsDefaultRegion: appConfig().fileSystems.s3.region,
       awsEndpoint: appConfig().fileSystems.s3.endpoint,
       minio: true,
+      // google cloud storage
+      gcpProjectId: appConfig().fileSystems.gcs.projectId,
+      gcpKeyFile: appConfig().fileSystems.gcs.keyFile,
+      gcpApiEndpoint: appConfig().fileSystems.gcs.apiEndpoint,
+      gcpBucket: appConfig().fileSystems.gcs.bucket,
     },
   });
 

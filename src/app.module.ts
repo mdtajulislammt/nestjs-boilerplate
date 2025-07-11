@@ -4,6 +4,7 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 // import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 // internal imports
 import appConfig from './config/app.config';
@@ -37,6 +38,14 @@ import { PaymentModule } from './modules/payment/payment.module';
       //   password: appConfig().redis.password,
       //   port: +appConfig().redis.port,
       // },
+    }),
+    RedisModule.forRoot({
+      type: 'single',
+      options: {
+        host: appConfig().redis.host,
+        password: appConfig().redis.password,
+        port: +appConfig().redis.port,
+      },
     }),
     // disabling throttling for dev
     // ThrottlerModule.forRoot([
