@@ -9,11 +9,11 @@ import {
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
-import { RolesGuard } from 'src/common/guard/role/roles.guard';
+import { RolesGuard } from '../../../common/guard/role/roles.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { Role } from 'src/common/guard/role/role.enum';
-import { Roles } from 'src/common/guard/role/roles.decorator';
+import { Role } from '../../../common/guard/role/role.enum';
+import { Roles } from '../../../common/guard/role/roles.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Conversation')

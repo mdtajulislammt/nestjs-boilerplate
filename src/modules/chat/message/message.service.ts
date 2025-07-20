@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MessageStatus, PrismaClient } from '@prisma/client';
+import { MessageStatus } from '@prisma/client';
 import appConfig from '../../../config/app.config';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -8,7 +8,7 @@ import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
 import { DateHelper } from '../../../common/helper/date.helper';
 import { MessageGateway } from './message.gateway';
 import { UserRepository } from '../../../common/repository/user/user.repository';
-import { Role } from 'src/common/guard/role/role.enum';
+import { Role } from '../../../common/guard/role/role.enum';
 
 @Injectable()
 export class MessageService {

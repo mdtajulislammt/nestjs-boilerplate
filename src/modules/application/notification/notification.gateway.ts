@@ -8,12 +8,12 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { OnModuleInit } from '@nestjs/common';
+import Redis from 'ioredis';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { OnModuleInit } from '@nestjs/common';
-import appConfig from 'src/config/app.config';
-import Redis from 'ioredis';
+import appConfig from '../../../config/app.config';
 
 @WebSocketGateway({
   cors: {

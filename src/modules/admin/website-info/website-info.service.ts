@@ -3,7 +3,7 @@ import { CreateWebsiteInfoDto } from './dto/create-website-info.dto';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { SojebStorage } from '../../../common/lib/Disk/SojebStorage';
 import appConfig from '../../../config/app.config';
-import { StringHelper } from 'src/common/helper/string.helper';
+import { StringHelper } from '../../../common/helper/string.helper';
 
 @Injectable()
 export class WebsiteInfoService {
