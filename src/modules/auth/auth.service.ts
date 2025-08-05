@@ -334,8 +334,8 @@ export class AuthService {
     type,
   }: {
     name: string;
-    first_name: string;
-    last_name: string;
+    first_name?: string;
+    last_name?: string;
     email: string;
     password: string;
     type?: string;
@@ -356,8 +356,8 @@ export class AuthService {
 
       const user = await UserRepository.createUser({
         name: name,
-        first_name: first_name,
-        last_name: last_name,
+        first_name: first_name || '',
+        last_name: last_name || '',
         email: email,
         password: password,
         type: type,
