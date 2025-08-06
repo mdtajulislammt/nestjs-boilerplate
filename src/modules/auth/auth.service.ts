@@ -3,6 +3,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
+import * as bcrypt from 'bcrypt';
 
 //internal imports
 import appConfig from '../../config/app.config';
@@ -222,22 +223,52 @@ export class AuthService {
     }
   }
 
-  async login({ email, userId }) {
+  async login({ email, password, token }) {
     try {
-      const payload = { email: email, sub: userId };
+      // Step 1: Fetch user from the database using the email
+      const user = await this.prisma.user.findUnique({
+        where: { email },
+      });
 
+      if (!user) {
+        return { success: false, message: 'User not found' };
+      }
+
+      // Step 2: If token is provided, validate it
+      if (token) {
+        // Validate the token (assuming the token is stored in the Ucode repository)
+        const tokenRecord = await UcodeRepository.validateToken({
+          email: email,
+          token: token,
+        });
+
+        if (!tokenRecord) {
+          return { success: false, message: 'Invalid token' };
+        }
+
+        // If the token is valid, update email_verified_at
+        await this.prisma.user.update({
+          where: { email },
+          data: { email_verified_at: new Date() }, // Mark the email as verified
+        });
+      }
+
+      // Step 3: Check if the email is verified
+      if (!user.email_verified_at) {
+        return { success: false, message: 'Please verify your email' };
+      }
+
+      // Step 4: Validate password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return { success: false, message: 'Invalid password' };
+      }
+
+      // Step 5: Generate JWT tokens (access and refresh tokens)
+      const payload = { email: user.email, sub: user.id };
       const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
       const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-      const user = await UserRepository.getUserDetails(userId);
-
-      // store refreshToken
-      await this.redis.set(
-        `refresh_token:${user.id}`,
-        refreshToken,
-        'EX',
-        60 * 60 * 24 * 7, // 7 days in seconds
-      );
 
       return {
         success: true,
@@ -250,10 +281,7 @@ export class AuthService {
         type: user.type,
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-      };
+      return { success: false, message: error.message };
     }
   }
 
@@ -521,58 +549,56 @@ export class AuthService {
     }
   }
 
-  async verifyEmail({ email, token }) {
-    try {
-      const user = await UserRepository.exist({
-        field: 'email',
-        value: email,
-      });
+// Method to verify email using token
+async verifyEmail({ email, token }) {
+  try {
+    // Step 1: Check if the user exists
+    const user = await UserRepository.exist({
+      field: 'email',
+      value: email,
+    });
 
-      if (user) {
-        const existToken = await UcodeRepository.validateToken({
-          email: email,
-          token: token,
-        });
-
-        if (existToken) {
-          await this.prisma.user.update({
-            where: {
-              id: user.id,
-            },
-            data: {
-              email_verified_at: new Date(Date.now()),
-            },
-          });
-
-          // delete otp code
-          // await UcodeRepository.deleteToken({
-          //   email: email,
-          //   token: token,
-          // });
-
-          return {
-            success: true,
-            message: 'Email verified successfully',
-          };
-        } else {
-          return {
-            success: false,
-            message: 'Invalid token',
-          };
-        }
-      } else {
-        return {
-          success: false,
-          message: 'Email not found',
-        };
-      }
-    } catch (error) {
+    if (!user) {
       return {
         success: false,
-        message: error.message,
+        message: 'Email not found',
       };
     }
+
+    // Step 2: Validate the token
+    const existToken = await UcodeRepository.validateToken({
+      email: email,
+      token: token,
+    });
+
+    if (!existToken) {
+      return {
+        success: false,
+        message: 'Invalid or expired token',
+      };
+    }
+
+    // Step 3: Update the user's email_verified_at field to mark it as verified
+    await this.prisma.user.update({
+      where: { email },
+      data: { email_verified_at: new Date() }, // Set current timestamp for email verification
+    });
+
+    // Step 4: Optionally delete the token from the Ucode table after successful verification
+    await UcodeRepository.deleteToken({ email, token });
+
+    return {
+      success: true,
+      message: 'Email successfully verified',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'An error occurred during email verification',
+    };
   }
+}
+
 
   async resendVerificationEmail(email: string) {
     try {

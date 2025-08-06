@@ -80,7 +80,7 @@ describe('AuthController', () => {
   it('should register a user', async () => {
     const dto = {
       name: 'John Doe',
-      first_name: 'John',
+      first_name: 'John', 
       last_name: 'Doe',
       email: 'john@example.com',
       password: 'password',

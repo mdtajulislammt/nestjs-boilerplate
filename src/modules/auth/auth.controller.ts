@@ -56,8 +56,8 @@ export class AuthController {
   async create(@Body() data: CreateUserDto) {
     try {
       const name = data.name;
-      const first_name = data.first_name;
-      const last_name = data.last_name;
+      const first_name = data.first_name || null;
+      const last_name = data.last_name || null;
       const email = data.email;
       const password = data.password;
       const type = data.type;
@@ -65,18 +65,18 @@ export class AuthController {
       if (!name) {
         throw new HttpException('Name not provided', HttpStatus.UNAUTHORIZED);
       }
-      if (!first_name) {
-        throw new HttpException(
-          'First name not provided',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-      if (!last_name) {
-        throw new HttpException(
-          'Last name not provided',
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
+      // if (!first_name) {
+      //   throw new HttpException(
+      //     'First name not provided',
+      //     HttpStatus.UNAUTHORIZED,
+      //   );
+      // }
+      // if (!last_name) {
+      //   throw new HttpException(
+      //     'Last name not provided',
+      //     HttpStatus.UNAUTHORIZED,
+      //   );
+      // }
       if (!email) {
         throw new HttpException('Email not provided', HttpStatus.UNAUTHORIZED);
       }
@@ -89,8 +89,8 @@ export class AuthController {
 
       const response = await this.authService.register({
         name: name,
-        first_name: first_name,
-        last_name: last_name,
+        first_name: first_name || null,
+        last_name: last_name || null,
         email: email,
         password: password,
         type: type,
@@ -109,17 +109,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req: Request, @Res() res: Response) {
+  async login(@Body() body: { email: string, password: string, token?: string }, @Req() req: Request, @Res() res: Response) {
     try {
-      const user_id = req.user.id;
-
-      const user_email = req.user.email;
+      // console.log(req.user);
+      const { email, password, token } = body;  // Retrieve token and password from the request body
+      const user_id = req.user.id;  // req.user contains the authenticated user's info
+      
 
       const response = await this.authService.login({
-        userId: user_id,
-        email: user_email,
+        email,
+        password,
+        token,
+        // user_id: user_id, 
       });
 
+       // If login failed (i.e., email not verified), return the response
+       if (!response.success) {
+        return res.status(401).json(response); // Return the error message to the user
+      }
       // store to secure cookies
       res.cookie('refresh_token', response.authorization.refresh_token, {
         httpOnly: true,
