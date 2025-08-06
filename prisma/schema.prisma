@@ -99,6 +99,7 @@ model Ucode {
   email      String?
   expired_at DateTime?
 
+  @@unique([email, token])
   @@map("ucodes")
 }
 

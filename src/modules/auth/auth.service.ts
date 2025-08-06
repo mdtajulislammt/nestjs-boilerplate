@@ -26,6 +26,7 @@ export class AuthService {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
+  // get user details
   async me(userId: string) {
     try {
       const user = await this.prisma.user.findFirst({
@@ -78,6 +79,7 @@ export class AuthService {
     }
   }
 
+  // update user details
   async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,
@@ -169,6 +171,7 @@ export class AuthService {
     }
   }
 
+  // validate user
   async validateUser(
     email: string,
     pass: string,
@@ -223,6 +226,7 @@ export class AuthService {
     }
   }
 
+  // login user
   async login({ email, password, token }) {
     try {
       // Step 1: Fetch user from the database using the email
@@ -285,6 +289,7 @@ export class AuthService {
     }
   }
 
+  // refresh token
   async refreshToken(user_id: string, refreshToken: string) {
     try {
       const storedToken = await this.redis.get(`refresh_token:${user_id}`);
@@ -329,6 +334,7 @@ export class AuthService {
     }
   }
 
+  // revoke refresh token
   async revokeRefreshToken(user_id: string) {
     try {
       const storedToken = await this.redis.get(`refresh_token:${user_id}`);
@@ -353,6 +359,7 @@ export class AuthService {
     }
   }
 
+  // register user
   async register({
     name,
     first_name,
@@ -463,6 +470,7 @@ export class AuthService {
     }
   }
 
+  // forgot password
   async forgotPassword(email) {
     try {
       const user = await UserRepository.exist({
@@ -500,6 +508,7 @@ export class AuthService {
     }
   }
 
+  // reset password
   async resetPassword({ email, token, password }) {
     try {
       const user = await UserRepository.exist({
@@ -552,11 +561,11 @@ export class AuthService {
 // Method to verify email using token
 async verifyEmail({ email, token }) {
   try {
-    // Step 1: Check if the user exists
+    // Step 1: Check if the user exists by email
     const user = await UserRepository.exist({
       field: 'email',
       value: email,
-    });
+    }); 
 
     if (!user) {
       return {
@@ -565,7 +574,7 @@ async verifyEmail({ email, token }) {
       };
     }
 
-    // Step 2: Validate the token
+    // Step 2: Validate the token by checking if it exists and is valid
     const existToken = await UcodeRepository.validateToken({
       email: email,
       token: token,
@@ -578,20 +587,24 @@ async verifyEmail({ email, token }) {
       };
     }
 
-    // Step 3: Update the user's email_verified_at field to mark it as verified
+    // Step 3: Update the user's `email_verified_at` field to mark the email as verified
     await this.prisma.user.update({
       where: { email },
       data: { email_verified_at: new Date() }, // Set current timestamp for email verification
     });
 
-    // Step 4: Optionally delete the token from the Ucode table after successful verification
-    await UcodeRepository.deleteToken({ email, token });
+    // Step 4: Delete the token from the `ucodes` table after successful email verification
+    await UcodeRepository.deleteToken({
+      email: email,
+      token: token,
+    });
 
     return {
       success: true,
       message: 'Email successfully verified',
     };
   } catch (error) {
+    // In case of an error, catch it and return a proper message
     return {
       success: false,
       message: error.message || 'An error occurred during email verification',
@@ -600,6 +613,7 @@ async verifyEmail({ email, token }) {
 }
 
 
+  // resend verification email
   async resendVerificationEmail(email: string) {
     try {
       const user = await UserRepository.getUserByEmail(email);
@@ -636,6 +650,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // change password
   async changePassword({ user_id, oldPassword, newPassword }) {
     try {
       const user = await UserRepository.getUserDetails(user_id);
@@ -675,6 +690,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // request email change
   async requestEmailChange(user_id: string, email: string) {
     try {
       const user = await UserRepository.getUserDetails(user_id);
@@ -709,6 +725,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // change email
   async changeEmail({
     user_id,
     new_email,
@@ -765,6 +782,7 @@ async verifyEmail({ email, token }) {
   }
 
   // --------- 2FA ---------
+  // generate 2FA secret
   async generate2FASecret(user_id: string) {
     try {
       return await UserRepository.generate2FASecret(user_id);
@@ -776,6 +794,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // verify 2FA
   async verify2FA(user_id: string, token: string) {
     try {
       const isValid = await UserRepository.verify2FA(user_id, token);
@@ -797,6 +816,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // enable 2FA
   async enable2FA(user_id: string) {
     try {
       const user = await UserRepository.getUserDetails(user_id);
@@ -820,6 +840,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
+  // disable 2FA
   async disable2FA(user_id: string) {
     try {
       const user = await UserRepository.getUserDetails(user_id);
@@ -842,5 +863,6 @@ async verifyEmail({ email, token }) {
       };
     }
   }
+
   // --------- end 2FA ---------
 }

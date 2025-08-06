@@ -100,7 +100,7 @@ describe('AuthController', () => {
       cookie: jest.fn(),
       json: jest.fn(),
     };
-    await controller.login({ user: mockUserRequest.user } as any, res as any);
+    await controller.login({ user: mockUserRequest.user } as any, res as any, res as any);
     expect(res.cookie).toHaveBeenCalled();
     expect(res.json).toHaveBeenCalled();
   });

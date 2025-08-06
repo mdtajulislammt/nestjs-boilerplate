@@ -113,7 +113,7 @@ export class AuthController {
     try {
       // console.log(req.user);
       const { email, password, token } = body;  // Retrieve token and password from the request body
-      const user_id = req.user.id;  // req.user contains the authenticated user's info
+      // const user_id = req.user.id;  // req.user contains the authenticated user's info
       
 
       const response = await this.authService.login({

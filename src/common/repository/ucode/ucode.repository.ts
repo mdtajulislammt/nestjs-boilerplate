@@ -133,13 +133,14 @@ export class UcodeRepository {
    * delete ucode token
    * @returns
    */
-  static async deleteToken({ email, token }) {
-    await prisma.ucode.deleteMany({
+  static async deleteToken({ email, token }: { email: string; token: string }) {
+    return await prisma.ucode.deleteMany({
       where: {
         AND: [{ email: email }, { token: token }],
       },
     });
   }
+  
 
   static async createVerificationToken(params: {
     userId: string;
