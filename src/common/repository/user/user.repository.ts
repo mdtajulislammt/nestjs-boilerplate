@@ -296,12 +296,16 @@ export class UserRepository {
     user_id: string,
     {
       name,
+      first_name,
+      last_name,
       email,
       password,
       role_id = null,
       type = 'user',
     }: {
       name?: string;
+      first_name?: string;
+      last_name?: string;
       email?: string;
       password?: string;
       role_id?: string;
@@ -313,7 +317,13 @@ export class UserRepository {
       if (name) {
         data['name'] = name;
       }
-      if (email) {
+      if (first_name) {
+        data['first_name'] = first_name;
+      }
+      if (last_name) {
+        data['last_name'] = last_name;
+      }
+      if (email) {  
         // Check if email already exist
         const userEmailExist = await UserRepository.exist({
           field: 'email',

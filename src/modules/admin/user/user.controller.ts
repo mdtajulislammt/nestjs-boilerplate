@@ -92,6 +92,7 @@ export class UserController {
     }
   }
 
+  // @Roles(Role.ADMIN, Role.MANAGER)
   @ApiResponse({ description: 'Get a user by id' })
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -105,6 +106,7 @@ export class UserController {
       };
     }
   }
+
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
