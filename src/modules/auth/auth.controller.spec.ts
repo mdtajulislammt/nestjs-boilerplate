@@ -177,7 +177,7 @@ describe('AuthController', () => {
 
   it('should generate 2FA secret', async () => {
     const result = await controller.generate2FASecret({ user: { userId: 1 } } as any);
-    expect(result.data.qrCode).toBe('base64');
+    expect(result.data.qrCode).toBe('base64'); 
   });
 
   it('should verify 2FA token', async () => {

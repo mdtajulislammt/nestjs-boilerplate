@@ -399,11 +399,12 @@ export class AuthController {
     } catch (error) {
       return {
         success: false,
-        message: 'Something went wrong',
+        message: 'Something went wrong',                  
       };
     }
   }
 
+  // change email address with token
   @ApiOperation({ summary: 'Change email address' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -435,6 +436,41 @@ export class AuthController {
       };
     }
   }
+
+// change email address without token
+@ApiOperation({ summary: 'Change email address without token' })
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
+@Post('changeEmail')
+async changeEmailWithoutToken( 
+  @Req() req: Request,
+  @Body() data: { old_email: string; password: string; new_email: string },
+) {
+  try {
+    const user_id = req.user.userId; // Extract user ID from JWT token
+    const { old_email, password, new_email } = data;
+
+    if (!old_email || !password || !new_email) {
+      throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.authService.changeEmailWithoutToken({  
+      user_id,
+      old_email,
+      password,
+      new_email,
+    });
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'Something went wrong',
+    };
+  }
+}
+
+
+
+
   // -------end change email address------
 
   // --------- 2FA ---------

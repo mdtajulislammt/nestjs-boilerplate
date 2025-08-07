@@ -734,7 +734,7 @@ async verifyEmail({ email, token }) {
     }
   }
 
-  // change email
+  // change email  with token= 457890
   async changeEmail({
     user_id,
     new_email,
@@ -790,6 +790,87 @@ async verifyEmail({ email, token }) {
       };
     }
   }
+
+  // change email without token
+  async changeEmailWithoutToken({
+    user_id,
+    old_email,
+    password,
+    new_email,
+  }: {
+    user_id: string;
+    old_email: string;
+    password: string;
+    new_email: string;
+  }) {
+    try {
+      // Step 1: Fetch the user by user_id
+      const user = await UserRepository.getUserDetails(user_id);
+
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found',
+        };
+      }
+
+      // Step 2: Verify that the provided old email matches the one in the database
+      if (user.email !== old_email) {
+        return {
+          success: false,
+          message: 'Current email does not match',
+        };
+      }
+
+      // Step 3: Validate the provided password
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return {
+          success: false,
+          message: 'Incorrect password',
+        };
+      }
+
+      // Step 4: Check if the new email is already in use by another user
+      const existingUser = await UserRepository.exist({
+        field: 'email',
+        value: new_email,
+      });
+
+      if (existingUser) {
+        return {
+          success: false,
+          message: 'Email is already in use',
+        };
+      }
+
+      // Step 5: Update the email in the database
+      const updatedUser = await UserRepository.updateUser(user_id, {
+        email: new_email,
+      });
+      // console.log("updatedUser",updatedUser);
+
+      if (!updatedUser) {
+        return {
+          success: false,
+          message: 'Failed to update email',
+        };
+      }
+
+      // Step 6: Return success response
+      return {
+        success: true,
+        message: 'Email updated successfully',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message || 'An error occurred while updating the email',
+      };
+    }
+  }
+
 
   // --------- 2FA ---------
   // generate 2FA secret

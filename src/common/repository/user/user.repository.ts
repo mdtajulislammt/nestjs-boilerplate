@@ -404,6 +404,8 @@ export class UserRepository {
     }
   }
 
+  
+
   /**
    * delete user
    * @param param0
@@ -464,6 +466,87 @@ export class UserRepository {
       throw error;
     }
   }
+
+
+  /**
+ * change email without token
+ * @param param0
+ * @returns
+ */
+static async changeEmailWithoutToken({
+  user_id,
+  old_email,
+  password,
+  new_email,
+}: {
+  user_id: string;
+  old_email: string;
+  password: string;
+  new_email: string;
+}) {
+  try {
+    // Step 1: Fetch the user by ID to check if the user exists
+    const user = await prisma.user.findUnique({
+      where: { id: user_id },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found',
+      };
+    }
+
+    // Step 2: Verify the current email provided matches the one stored in the database
+    if (user.email !== old_email) {
+      return {
+        success: false,
+        message: 'Current email does not match',
+      };
+    }
+
+    // Step 3: Validate the password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return {
+        success: false,
+        message: 'Incorrect password',
+      };
+    }
+
+    // Step 4: Check if the new email is already in use
+    const existingUser = await prisma.user.findUnique({
+      where: { email: new_email },
+    });
+
+    if (existingUser) {
+      return {
+        success: false,
+        message: 'Email is already in use',
+      };
+    }
+
+    // Step 5: Proceed with updating the email
+    const updatedUser = await prisma.user.update({
+      where: { id: user_id },
+      data: { email: new_email },
+    });
+
+    // Step 6: Return success message
+    return {
+      success: true,
+      message: 'Email updated successfully',
+      data: updatedUser, // Return updated user data
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'An error occurred while updating the email',
+    };
+  }
+}
+
 
   // change email
   static async changeEmail({
