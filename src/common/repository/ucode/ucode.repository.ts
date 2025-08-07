@@ -103,6 +103,7 @@ export class UcodeRepository {
               ],
             },
           });
+          // console.log("data",data);
           if (data) {
             // delete this token
             // await prisma.ucode.delete({
@@ -133,10 +134,10 @@ export class UcodeRepository {
    * delete ucode token
    * @returns
    */
-  static async deleteToken({ email, token }: { email: string; token: string }) {
+  static async deleteToken({ email, token, userId }: { email: string; token: string, userId: string }) {
     return await prisma.ucode.deleteMany({
       where: {
-        AND: [{ email: email }, { token: token }],
+        AND: [{ email: email }, { token: token }, { user_id: userId }],
       },
     });
   }

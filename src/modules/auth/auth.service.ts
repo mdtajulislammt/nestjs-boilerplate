@@ -269,6 +269,13 @@ export class AuthService {
         return { success: false, message: 'Invalid password' };
       }
 
+      // delete token code
+      await UcodeRepository.deleteToken({
+        email: email,
+        token: token,
+        userId: user.id,
+      });
+
       // Step 5: Generate JWT tokens (access and refresh tokens)
       const payload = { email: user.email, sub: user.id };
       const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
@@ -532,6 +539,7 @@ export class AuthService {
           await UcodeRepository.deleteToken({
             email: email,
             token: token,
+            userId: user.id,
           });
 
           return {
@@ -597,6 +605,7 @@ async verifyEmail({ email, token }) {
     await UcodeRepository.deleteToken({
       email: email,
       token: token,
+      userId: user.id,
     });
 
     return {
@@ -755,6 +764,7 @@ async verifyEmail({ email, token }) {
           await UcodeRepository.deleteToken({
             email: new_email,
             token: token,
+            userId: user.id,
           });
 
           return {
