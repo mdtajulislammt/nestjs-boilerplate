@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Delete, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Patch,
+  Body,
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from '../../../common/guard/role/role.enum';
@@ -63,4 +72,55 @@ export class NotificationController {
       };
     }
   }
+
+  // update notification settings
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('update-notifications')
+  @ApiOperation({
+    summary: 'Update notification settings for a specific user by ID',
+  })
+  async updateNotifications(
+    @Body()
+    data: {
+      user_id: string;
+      push_notifications?: boolean;
+      email_notifications?: boolean;
+      voting_notifications?: boolean;
+      general_alerts?: boolean;
+    },
+  ) {
+    const { user_id, ...settings } = data;
+  
+    
+    const response =
+      await this.notificationService.updateNotificationSettingsById(
+        user_id,
+        settings,
+      );
+  
+    if (response.success) {
+      
+      const {
+        push_notifications,
+        email_notifications,
+        voting_notifications,
+        general_alerts,
+      } = response.data;
+  
+      return {
+        success: true,
+        message: response.message,
+        data: {
+        push_notifications,
+        email_notifications,
+        voting_notifications,
+        general_alerts,
+        },
+      };
+    } else {
+      return { success: false, message: response.message };
+    }
+  }
+  
 }

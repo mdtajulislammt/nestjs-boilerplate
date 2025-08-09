@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +18,8 @@ import { Role } from '../../../common/guard/role/role.enum';
 import { Roles } from '../../../common/guard/role/roles.decorator';
 import { RolesGuard } from '../../../common/guard/role/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Response } from 'express';
+
 
 @ApiBearerAuth()
 @ApiTags('User')
@@ -133,4 +136,37 @@ export class UserController {
       };
     }
   }
+
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('disable/:id')  // User ID passed as a URL parameter
+  async disableAccount(@Param('id') userId: string, @Res() res: Response) { 
+    try {
+      // Call the service function
+      const response = await this.userService.disableAccount(userId); 
+  
+      // Check if the response is a success
+      if (response.success) {
+        // Send the successful response
+        return res.status(200).json(response); 
+      } else {
+        // Handle failure if account could not be disabled
+        return res.status(400).json({
+          success: false,
+          message: response.message || 'Account could not be disabled.',
+        });
+      }
+    } catch (error) {
+      // Handle any internal errors
+      return res.status(500).json({ 
+        success: false,
+        message: 'An error occurred while disabling the account.',
+      });
+    }
+  }
+  
+
+
+
 }

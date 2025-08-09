@@ -224,4 +224,44 @@ export class UserService {
       };
     }
   }
+
+  // Disable account function
+async disableAccount(userId: string) {
+  try {
+    // Step 1: Check if user exists
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: 'User not found',
+      };
+    }
+
+    // Step 2: Disable the user's account (set is_active to false)
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        is_active: false, // Set the account as inactive
+      },
+    });
+
+    return {
+      success: true,
+      message: 'Account disabled successfully',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'Error occurred while disabling the account',
+    };
+  }
+}
+
 }
